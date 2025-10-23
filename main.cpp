@@ -14,6 +14,11 @@ struct Node
     {
         return this->data >= b->data;
     }
+    ostream& operator<<(ostream& os, const Node& n)
+    {
+        os << n.data;
+        return os;
+    }
 };
 
 
@@ -23,6 +28,7 @@ class priorityQ
 private:
     T* arr;
     int max_capacity;
+    int cur_capacity;
 public:
     priorityQ(int sz);
     void push();// Eskandrani
@@ -31,13 +37,43 @@ public:
     T getLeftChild();// Eskandrani
     T getRightChild();// Eskandrani
     T getParent();// Eskandrani
-    bool hasLeftChild();// AboElfotouh
-    bool hasRightChild();  // AboElfotouh
-    bool hasParent();   // AboElfotouh
-    bool isEmpty();  // AboElfotouh
+    bool hasLeftChild(int i)
+    {
+        return cur_capacity > i * 2 + 1;
+    }
+    bool hasRightChild(int i)
+    {
+        return cur_capacity > i * 2 + 2;
+    }
+    bool hasParent(int i)
+    {
+        return cur_capacity > (i - 1) / 2;
+    }
+    bool isEmpty()
+    {
+        if(cur_capacity)
+        {
+            return 1;
+        }
+        return 0;
+    }
     void shiftDown(); // Eskandrani
-    void shiftUp();   // AboElfotouh
-    void print();// AboElfotouh
+    void shiftUp(int i)
+    {
+        while(i > 0 && arr[i] > arr[getParent(i)])
+        {
+            swap(arr[i], arr[getParent(i)]);
+            i = getParent(i);
+        }
+    }
+    void print()
+    {
+        for(int i = 0; i < cur_capacity; i++)
+        {
+            cout << arr[i];
+        }
+        cout << endl;
+    }
 };
 
 template <typename T>
