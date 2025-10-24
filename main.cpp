@@ -254,10 +254,41 @@ public:
         delete[] freq;
     }
 
-    ofstream decompress(ifstream infile); // Omar
-    void preOrder()                       // Omar
-    {
+    ofstream decompress(ifstream infile) {
+        ofstream outfile("decompressed.txt");
+        if (!infile.is_open())
+            throw runtime_error("Compressed file not open.");
+
+        string bitstring;
+        string output;
+
+        char bit;
+
+        while (infile.get(bit))
+            if (bit == '0' || bit == '1')
+                bitstring += bit;
+
+        Node* cur = root;
+
+        for (auto x : bitstring) {
+            if (x == '0') {
+                cur = cur->left;
+            } else {
+                cur = cur->right;
+            }
+            if (!cur->left && !cur->right) {
+                outfile <<  cur->ch;
+                cur = root;
+            }
+        }
+    
+        infile.close();
+        outfile.close();
+
+        return outfile;
+
     }
+    
 };
 int main()
 {
