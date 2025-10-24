@@ -4,44 +4,63 @@
 using namespace std;
 struct Node
 {
-    int data;
-    Node* right;
-    Node* left;
+    int freq;
+    char ch;
+    Node *right;
+    Node *left;
     Node()
     {
-        data = 0;
-        left=nullptr;
-        right =nullptr;
+        freq = 0;
+        left = nullptr;
+        right = nullptr;
     }
     Node(int d)
     {
-        data = d;
-        left=nullptr;
-        right =nullptr;
+        freq = d;
+        left = nullptr;
+        right = nullptr;
     }
-    bool operator<(const Node& b) const
+
+    bool operator<(const Node &b) const
     {
-        return this->data < b.data; // I think 'or equal' makes no sense
+        if (this->freq == b.freq)
+            return this->ch < b.ch;
+        else
+            return this->freq < b.freq;
     }
-    bool operator>(const Node& b) const
+
+    bool operator>(const Node &b) const
     {
-        return this->data > b.data;
+        if (this->freq == b.freq)
+            return this->ch > b.ch;
+        else
+            return this->freq > b.freq;
     }
-    Node& operator=(const Node& b)
+
+    bool operator==(const Node &b) const
     {
-        this->data = b.data;
+        return (this->ch == b.ch && this->freq == b.freq && this->left == b.left && this->right == b.right);
+    }
+
+    Node &operator=(const Node &b)
+    {
+        this->freq = b.freq;
+        this->ch = b.ch;
         this->left = b.left;
         this->right = b.right;
         return *this;
     }
-    friend ostream& operator<<(ostream& os, const Node& n) // made friend function
+
+    friend ostream &operator<<(ostream &os, const Node &n) // made friend function
     {
-        os << n.data;
+        os << n.freq;
+        os << n.ch; // D: Not sure about this.
         return os;
     }
 };
+
 template <typename T>
-void swap(T& a, T& b)
+void swap(T &a, T &b)
 {
     T temp = a;
     a = b;
@@ -52,46 +71,47 @@ template <typename T>
 class priorityQ
 {
 private:
-    T* arr;
+    T *arr;
     int max_capacity;
     int cur_capacity;
+
 public:
     priorityQ(int sz)
     {
         max_capacity = sz;
         arr = new T[sz];
         cur_capacity = 0;
-    }    
+    }
     ~priorityQ()
     {
         delete[] arr;
     }
-    void push(const T& x)
+    void push(const T &x)
     {
-        if(cur_capacity==max_capacity)
+        if (cur_capacity == max_capacity)
         {
             throw runtime_error("Debug: PriorityQ is Full");
         }
         cur_capacity++;
-        arr[cur_capacity-1]=x;
-        shiftUp(cur_capacity-1);
+        arr[cur_capacity - 1] = x;
+        shiftUp(cur_capacity - 1);
     }
 
     T pop()
     {
-        if(isEmpty())
+        if (isEmpty())
         {
             throw runtime_error("Debug: PriorityQ is Empty");
         }
-        T popped=arr[0];
-        arr[0]=arr[cur_capacity-1];
+        T popped = arr[0];
+        arr[0] = arr[cur_capacity - 1];
         cur_capacity--;
         shiftDown(0);
         return popped;
     }
     T top()
     {
-        if(isEmpty())
+        if (isEmpty())
         {
             throw runtime_error("Debug: PriorityQ is Empty");
         }
@@ -99,15 +119,15 @@ public:
     }
     int getLeftChild(int i)
     {
-        return i*2+1;
+        return i * 2 + 1;
     }
     int getRightChild(int i)
     {
-        return i*2+2;
+        return i * 2 + 2;
     }
     int getParent(int i)
     {
-        return (i-1)/2;
+        return (i - 1) / 2;
     }
     bool hasLeftChild(int i)
     {
@@ -119,32 +139,32 @@ public:
     }
     bool hasParent(int i)
     {
-        return i > 0 ; // corrected
+        return i > 0; // corrected
     }
     bool isEmpty()
     {
-        
+
         return !cur_capacity; // was inverted
     }
     void shiftDown(int i)
     {
-        while(hasLeftChild(i))
+        while (hasLeftChild(i))
         {
             int Smallest = i;
 
-            if(arr[getLeftChild(i)]< arr[Smallest])
+            if (arr[getLeftChild(i)] < arr[Smallest])
             {
-                Smallest=getLeftChild(i);
+                Smallest = getLeftChild(i);
             }
-            if(hasRightChild(i) && arr[getRightChild(i)]< arr[Smallest])
+            if (hasRightChild(i) && arr[getRightChild(i)] < arr[Smallest])
             {
-                Smallest=getRightChild(i);
+                Smallest = getRightChild(i);
             }
-            
-            if(Smallest!=i)
+
+            if (Smallest != i)
             {
-                swap(arr[i],arr[Smallest]);
-                i=Smallest;
+                swap(arr[i], arr[Smallest]);
+                i = Smallest;
             }
             else
             {
@@ -154,7 +174,7 @@ public:
     }
     void shiftUp(int i)
     {
-        while(i > 0 && arr[i] < arr[getParent(i)]) // smallest to the top
+        while (i > 0 && arr[i] < arr[getParent(i)]) // smallest to the top
         {
             swap(arr[i], arr[getParent(i)]);
             i = getParent(i);
@@ -162,7 +182,7 @@ public:
     }
     void print()
     {
-        for(int i = 0; i < cur_capacity; i++)
+        for (int i = 0; i < cur_capacity; i++)
         {
             cout << arr[i];
         }
@@ -171,32 +191,72 @@ public:
 };
 
 template <typename T>
+int search(T &arr, T item)
+{
+    for (int i = 0; i < arr.size(); i++)
+    {
+        if (arr[i] == item) return i;
+    }
+    return -1;
+}
+
+template <typename T>
 class huffmanTree
 {
 private:
-    priorityQ <T> pq;
-    int* freq;
+    priorityQ<T> pq;
+    Node *freqTable;
     int capacity;
+
 public:
-    huffmanTree(int sz): pq(sz)
+    huffmanTree(int sz = 256) : pq(sz)
     {
         capacity = sz;
-        freq = new int[sz];
-        fill_n(freq, sz, 0);
+        freq = new Node[sz];
+        // fill_n(freq, sz, 0);
     }
     ~huffmanTree()
     {
         delete[] freq;
     }
-    void populate_freq(ifstream infile) // Elhusseiny
-    {
 
+    void frequencyTable(ifstream infile) // Elhusseiny
+    {
+        infile.open("testCompressed.txt");
+        char x;
+
+        if (infile.is_open())
+        {
+            int i = 0;
+            while (!infile.eof())
+            {
+                infile.get(x);
+
+                if(search(freqTable, ) != -1)
+                
+                else
+
+                i++;
+            }
+
+            infile.close();
+            return;
+        }
+        else
+        {
+            cout << "\nError: Uncompressed File is not open!\n";
+            return;
+        }
     }
-    ofstream compress(); //Elhusseiny
-    ofstream decompress(ifstream infile); //Omar
-    void preOrder()   // Omar
+    ofstream compress(); // Elhusseiny
     {
 
+        delete[] freq;
+    }
+
+    ofstream decompress(ifstream infile); // Omar
+    void preOrder()                       // Omar
+    {
     }
 };
 int main()
@@ -204,5 +264,3 @@ int main()
 
     return 0;
 }
-
-
