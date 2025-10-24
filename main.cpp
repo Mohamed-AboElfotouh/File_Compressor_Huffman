@@ -22,6 +22,13 @@ struct Node
         left = nullptr;
         right = nullptr;
     }
+    Node(const Node &n)
+    {
+        this->ch = n.ch;
+        this->freq = n.freq;
+        this->left = n.left;
+        this->right = n.right;
+    }
 
     bool operator<(const Node &b) const
     {
@@ -53,21 +60,15 @@ struct Node
         return *this;
     }
 
-    friend ostream &operator<<(ostream &os, const Node &n) // made friend function
+    friend ostream &operator<<(ostream &os, const Node &n)
     {
         os << n.freq;
-        os << n.ch; // D: Not sure about this.
+        os << n.ch; 
         return os;
     }
 };
 
-template <typename T>
-void swap(T &a, T &b)
-{
-    T temp = a;
-    a = b;
-    b = temp;
-}
+
 
 template <typename T>
 class priorityQ
@@ -141,12 +142,12 @@ public:
     }
     bool hasParent(int i)
     {
-        return i > 0; // corrected
+        return i > 0;
     }
     bool isEmpty()
     {
 
-        return !cur_capacity; // was inverted
+        return !cur_capacity;
     }
 
     int getCapacity()
@@ -182,7 +183,7 @@ public:
     }
     void shiftUp(int i)
     {
-        while (i > 0 && arr[i] < arr[getParent(i)]) // smallest to the top
+        while (i > 0 && arr[i] < arr[getParent(i)]) 
         {
             swap(arr[i], arr[getParent(i)]);
             i = getParent(i);
@@ -198,7 +199,7 @@ public:
     }
 };
 
-// template <typename T>
+template <typename T1>
 class huffmanTree
 {
 private:
@@ -207,9 +208,6 @@ private:
     string *codeTable;
     Node* root;
     int capacity;
-
-    // ifstream infile;
-    // ofstream outfile;
 
 public:
     huffmanTree(int sz = 256) : theHuffman(sz)
@@ -225,38 +223,22 @@ public:
         delete[] freqTable;
     }
 
-    // int freqTableCurrSize()
-    // {
-    //     int count = 0;
-    //     int i = 0;
-    //     while (i <= capacity && freqTable[i].freq != 0)
-    //     {
-    //         count++;
-    //     }
-    //     return count;
-    // }
-
-    void generateFreqTable(ifstream infile)
+    void generateFreqTable(ifstream& infile)
     {
-        infile.open("testUncompressed.txt");
         char x;
 
         if (infile.is_open())
         {
-            // int i = 0;
-            int used[capacity]; /////////not used yet
-            while (!infile.eof())
+            while (infile.get(x))
             {
-                infile.get(x);
-                freqTable[int((unsigned char)x)]++; // learned it from AI, to amek sure we don't get negative chars.
+                freqTable[(unsigned char)x]++;
             }
-            infile.close();
 
             for (int i = 0; i < capacity; i++)
             {
                 if (freqTable[i] != 0)
                 {
-                    Node n(char(i), freqTable[i]);
+                    Node n(static_cast<char>(i), freqTable[i]);
                     theHuffman.push(n);
                 }
             }
@@ -285,55 +267,54 @@ public:
         makeCodes(node->right, code + "1"); // go right = 1;
     }
 
-    ofstream compress(ifstream infile)
+    void compress(ifstream& infile)
     {
-        priorityQ<Node> temp = theHuffman;
-        ofstream outfile;
-        infile.open("testUncompressed.txt");
-        outfile.open("testCompressed.txt");
-
-        while (temp.getCapacity() > 1)
+        ofstream outfile("testCompressed.txt");
+        while (theHuffman.getCapacity() > 1)
         {
-            Node *n1 = &temp.pop(); // the smaller
-            Node *n2 = &temp.pop(); // the larger or the same
-            Node N('\0', n1->freq + n2->freq);
+            Node n1 = theHuffman.pop(); // the smaller
+            Node n2 = theHuffman.pop(); // the larger or the same
+
+            Node* leftChild = new Node(n1);
+            Node* rightChild = new Node(n2);
+
+            Node N('\0', leftChild->freq + rightChild->freq);
 
             if (n1 > n2)
             {
-                N.right = n1;
-                N.left = n2;
+                N.right = leftChild;
+                N.left = rightChild;
             }
             else
             {
-                N.left = n1;
-                N.right = n2;
+                N.left = leftChild;
+                N.right = rightChild;
             }
 
-            temp.push(N);
+            theHuffman.push(N);
         } // Now you have a single top node that will be our whole tree root.
-        root = temp.top();
 
-        makeCodes(&root, ""); // now codeTable is filled at every needed index.
+        root = new Node(theHuffman.top());
+
+        makeCodes(root, ""); // now codeTable is filled at every needed index.
 
         if (!infile.is_open() || !outfile.is_open())
         {
             cout << "\nError: Uncompressed/compressed file is not open!\n";
-            return outfile;
+            return;
         }
         else
         {
             char x;
-            while (!infile.eof())
+            while (infile.get(x))
             {
-                infile.get(x);
                 outfile << codeTable[(int((unsigned char)x))];
             }
         }
-        // delete[] freqTable; ???? should we do it?
-        return outfile;
+        return;
     }
 
-    ofstream decompress(ifstream infile) {
+    void decompress(ifstream& infile) {
         ofstream outfile("decompressed.txt");
         if (!infile.is_open())
             throw runtime_error("Compressed file not open.");
@@ -361,10 +342,7 @@ public:
             }
         }
     
-        infile.close();
-        outfile.close();
-
-        return outfile;
+        return;
 
     }
     
@@ -372,24 +350,37 @@ public:
 
 int main()
 {
-    // Create a small sample file to test with
-    // ofstream testFile("testUncompressed.txt");
-    // testFile << "hello world";
-    // testFile.close();
-
-    // Create Huffman tree object
-    huffmanTree huff;
-
-    // Step 1: Generate frequency table
-    ifstream infile;
+   
+    
+    huffmanTree <Node> huff(256);
+    //step 1: generate frequency table
+    ifstream infile("testUncompressed.txt");
+    if (!infile.is_open()) {
+        cout << "File not found '\n";
+        return 1;
+    }
     huff.generateFreqTable(infile);
+    infile.close();
 
-    // Step 2: Compress file
-    ifstream infile2;
-    huff.compress(infile2);
+    // step 2: compress the file
+    infile.open("testUncompressed.txt");
+    if (!infile.is_open()) {
+        cout << "Error: Could not reopen file for compression.\n";
+        return 1;
+    }
+    huff.compress(infile);
+    infile.close();
+    cout << "Compression done! Check testCompressed.txt\n";
 
-    // Step 3: Display success message
-    cout << "Compression done! Check 'testCompressed.txt'.\n";
+    // step 3: decompress the file
+    infile.open("testCompressed.txt");
+    if (!infile.is_open()) {
+        cout << "Error: Could not open compressed file for decompression.\n";
+        return 1;
+    }
+    huff.decompress(infile);
+    infile.close();
+    cout << "Decompression done! Check decompressed.txt\n";
 
     return 0;
 }

@@ -1,2 +1,27 @@
-.vscode/
+
+# Ignore build outputs
 *.exe
+*.o
+*.obj
+/build/
+/bin/
+/out/
+
+# IDE/editor folders
+/.vscode/
+/.idea/
+workspace.xml
+
+# IntelliJ shelf and HTTP client requests
+/shelf/
+/httpRequests/
+
+# Datasource local storage (IDE-specific)
+/dataSources/
+/dataSources.local.xml
+
+# OS generated files
+Thumbs.db
+desktop.ini
+.DS_Store
+
