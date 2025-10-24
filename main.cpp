@@ -255,7 +255,7 @@ public:
         makeCodes(node->right, code + "1"); // go right = 1;
     }
 
-    Node* populate(int *freqT)
+    Node *populate(int *freqT)
     {
         for (int i = 0; i < capacity; i++)
         {
@@ -308,14 +308,16 @@ public:
         }
         else
         {
+            bool first = true;
             for (int i = 0; i < capacity; i++)
             {
                 if (freqT[i] != 0)
                 {
-                    // if()
-                    {
-                        outfile << char(i) << ':' << freqT[i] << ',';
-                    }
+                    if (!first)
+                        outfile << ','; // comma before not after
+                    first = false;
+
+                    outfile << char(i) << ':' << freqT[i];
                 }
             }
             outfile << endl;
