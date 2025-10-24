@@ -205,7 +205,7 @@ private:
     priorityQ<Node> theHuffman;
     int *freqTable;
     string *codeTable;
-    Node root;
+    Node* root;
     int capacity;
 
     // ifstream infile;
