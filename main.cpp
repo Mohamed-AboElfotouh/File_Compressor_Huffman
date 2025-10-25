@@ -340,6 +340,29 @@ public:
         if (!infile.is_open())
             throw runtime_error("Compressed file not open.");
 
+        string head;
+        getline(infile, head);
+
+        int freq[capacity] {};
+        
+        for (int i = 0; i < head.length(); i++) {
+            char symbol = head[i];
+            i++;
+            if (i >= head.length() || head[i] != ':') break;
+            i++;
+
+            int count = 0;
+            
+            while (i < head.length() && isdigit(head[i])) {
+                count = count * 10 + (head[i] - '0');
+                i++;
+            }
+
+            freq[(unsigned char)symbol] = count;
+        }
+        
+        Node* decompress_root = populate(freq);
+
         string bitstring;
         string output;
 
@@ -348,26 +371,22 @@ public:
         while (infile.get(bit))
             if (bit == '0' || bit == '1')
                 bitstring += bit;
+        
+        Node *cur = decompress_root;
 
-        Node *cur = root;
-
-        for (auto x : bitstring)
-        {
-            if (x == '0')
-            {
+        for (auto x : bitstring) {
+            if (x == '0') {
                 cur = cur->left;
             }
-            else
-            {
+            else {
                 cur = cur->right;
             }
-            if (!cur->left && !cur->right)
-            {
+            if (!cur->left && !cur->right) {
                 outfile << cur->ch;
-                cur = root;
+                cur = decompress_root;
             }
         }
-
+        
         return;
     }
 };
