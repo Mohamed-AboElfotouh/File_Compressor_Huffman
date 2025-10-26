@@ -197,15 +197,21 @@ public:
     }
 };
 
-template <typename T1>
 class huffmanTree
 {
 private:
     priorityQ<Node*> theHuffman;
     int *freqTable;
     string *codeTable;
-    Node *root;
     int capacity;
+
+    void deleteTree(Node* node) {
+        if (node) {
+            deleteTree(node->left);
+            deleteTree(node->right);
+            delete node;
+        }
+    }
 
 public:
     huffmanTree(int sz = 256) : theHuffman(sz)
@@ -216,9 +222,11 @@ public:
         fill_n(freqTable, sz, 0);
         fill_n(codeTable, sz, "");
     }
+
     ~huffmanTree()
     {
         delete[] freqTable;
+        delete[] codeTable;
     }
 
     int *generateFreqTable(ifstream &infile)
@@ -289,7 +297,7 @@ public:
         ofstream outfile("testCompressed.txt");
 
         int *freqT = generateFreqTable(infile);
-        root = populate(freqT);
+        Node* root = populate(freqT);
         makeCodes(root, ""); // now codeTable is filled at every needed index.
 
         if (!infile.is_open() || !outfile.is_open())
@@ -378,6 +386,8 @@ public:
             }
         }
         
+        deleteTree(decompress_root);
+
         return;
     }
 };
@@ -385,7 +395,7 @@ public:
 int main()
 {
 
-    huffmanTree<Node> huff(256);
+    huffmanTree huff(256);
     // step 1: generate frequency table
     ifstream infile("testUncompressed.txt");
     if (!infile.is_open())
