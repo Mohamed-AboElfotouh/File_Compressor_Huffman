@@ -159,11 +159,11 @@ public:
         {
             int Smallest = i;
 
-            if (arr[getLeftChild(i)] < arr[Smallest])
+            if (*arr[getLeftChild(i)] < *arr[Smallest])
             {
                 Smallest = getLeftChild(i);
             }
-            if (hasRightChild(i) && arr[getRightChild(i)] < arr[Smallest])
+            if (hasRightChild(i) && *arr[getRightChild(i)] < *arr[Smallest])
             {
                 Smallest = getRightChild(i);
             }
@@ -181,7 +181,7 @@ public:
     }
     void shiftUp(int i)
     {
-        while (i > 0 && arr[i] < arr[getParent(i)])
+        while (i > 0 && *arr[i] < *arr[getParent(i)])
         {
             swap(arr[i], arr[getParent(i)]);
             i = getParent(i);
@@ -201,7 +201,7 @@ template <typename T1>
 class huffmanTree
 {
 private:
-    priorityQ<Node> theHuffman;
+    priorityQ<Node*> theHuffman;
     int *freqTable;
     string *codeTable;
     Node *root;
@@ -261,36 +261,35 @@ public:
         {
             if (freqT[i] != 0)
             {
-                Node n(static_cast<char>(i), freqT[i]);
+                Node* n = new Node(static_cast<char>(i), freqT[i]);
                 theHuffman.push(n);
             }
         }
 
         while (theHuffman.getCapacity() > 1)
         {
-            Node n1 = theHuffman.pop(); // the smaller
-            Node n2 = theHuffman.pop(); // the larger or the same
+            Node* n1 = theHuffman.pop(); // the smaller
+            Node* n2 = theHuffman.pop(); // the larger or the same
 
-            Node *leftChild = new Node(n1);
-            Node *rightChild = new Node(n2);
+            Node *leftChild = new Node(*n1);
+            Node *rightChild = new Node(*n2);
 
-            Node N('\0', leftChild->freq + rightChild->freq);
+            Node* N = new Node('\0', leftChild->freq + rightChild->freq);
 
-            if (n1 > n2)
+            if (*n1 > *n2)
             {
-                N.right = leftChild;
-                N.left = rightChild;
+                N->right = leftChild;
+                N->left = rightChild;
             }
             else
             {
-                N.left = leftChild;
-                N.right = rightChild;
+                N->left = leftChild;
+                N->right = rightChild;
             }
             theHuffman.push(N);
         } // Now you have a single top node that will be our whole tree root.
 
-        Node *result = new Node(theHuffman.top());
-        return result;
+        return theHuffman.top();
     }
 
     void compress(ifstream &infile)
@@ -327,7 +326,7 @@ public:
             char x;
             while (infile.get(x))
             {
-                infile.get(x);
+                // infile.get(x);
                 outfile << codeTable[(int((unsigned char)x))];
             }
         }
@@ -340,6 +339,29 @@ public:
         if (!infile.is_open())
             throw runtime_error("Compressed file not open.");
 
+        string head;
+        getline(infile, head);
+
+        int freq[capacity] {};
+        
+        for (int i = 0; i < head.length(); i++) {
+            char symbol = head[i];
+            i++;
+            if (i >= head.length() || head[i] != ':') break;
+            i++;
+
+            int count = 0;
+            
+            while (i < head.length() && isdigit(head[i])) {
+                count = count * 10 + (head[i] - '0');
+                i++;
+            }
+
+            freq[(unsigned char)symbol] = count;
+        }
+        
+        Node* decompress_root = populate(freq);
+
         string bitstring;
         string output;
 
@@ -348,26 +370,22 @@ public:
         while (infile.get(bit))
             if (bit == '0' || bit == '1')
                 bitstring += bit;
+        
+        Node *cur = decompress_root;
 
-        Node *cur = root;
-
-        for (auto x : bitstring)
-        {
-            if (x == '0')
-            {
+        for (auto x : bitstring) {
+            if (x == '0') {
                 cur = cur->left;
             }
-            else
-            {
+            else {
                 cur = cur->right;
             }
-            if (!cur->left && !cur->right)
-            {
+            if (!cur->left && !cur->right) {
                 outfile << cur->ch;
-                cur = root;
+                cur = decompress_root;
             }
         }
-
+        
         return;
     }
 };
