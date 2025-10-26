@@ -255,41 +255,33 @@ public:
         makeCodes(node->right, code + "1"); // go right = 1;
     }
 
-    Node *populate(int *freqT)
-    {
-        for (int i = 0; i < capacity; i++)
-        {
-            if (freqT[i] != 0)
-            {
+    Node *populate(int *freqT) {
+        priorityQ<Node*> localHuffman(capacity); 
+
+        for (int i = 0; i < capacity; i++) {
+            if (freqT[i] != 0) {
                 Node* n = new Node(static_cast<char>(i), freqT[i]);
-                theHuffman.push(n);
+                localHuffman.push(n); 
             }
         }
 
-        while (theHuffman.getCapacity() > 1)
-        {
-            Node* n1 = theHuffman.pop(); // the smaller
-            Node* n2 = theHuffman.pop(); // the larger or the same
+        while (localHuffman.getCapacity() > 1) {
+            Node* n1 = localHuffman.pop();
+            Node* n2 = localHuffman.pop();
 
-            Node *leftChild = new Node(*n1);
-            Node *rightChild = new Node(*n2);
+            Node* N = new Node('\0', n1->freq + n2->freq);
 
-            Node* N = new Node('\0', leftChild->freq + rightChild->freq);
-
-            if (*n1 > *n2)
-            {
-                N->right = leftChild;
-                N->left = rightChild;
+            if (*n1 < *n2) {
+                N->left = n1;
+                N->right = n2;
+            } else {
+                N->left = n2;
+                N->right = n1;
             }
-            else
-            {
-                N->left = leftChild;
-                N->right = rightChild;
-            }
-            theHuffman.push(N);
-        } // Now you have a single top node that will be our whole tree root.
+            localHuffman.push(N);
+        } 
 
-        return theHuffman.top();
+        return localHuffman.top(); 
     }
 
     void compress(ifstream &infile)
