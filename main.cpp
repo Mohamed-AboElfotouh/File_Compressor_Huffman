@@ -330,6 +330,11 @@ public:
                 outfile << codeTable[(int((unsigned char)x))];
             }
         }
+
+        outfile.close();
+        infile.close();
+        deleteTree(root);
+        
         return;
     }
 
@@ -387,6 +392,8 @@ public:
         }
         
         deleteTree(decompress_root);
+        infile.close();
+        outfile.close();
 
         return;
     }
