@@ -315,8 +315,8 @@ public:
                     if (!first)
                         outfile << ','; // comma before not after
                     first = false;
-
-                    outfile << char(i) << ':' << freqT[i];
+                    if (char(i) == '\n') outfile << "En" << ':' << freqT[i];
+                    else outfile << char(i) << ':' << freqT[i];
                 }
             }
             outfile << endl;
@@ -352,7 +352,11 @@ public:
         for (int i = 0; i < head.length(); i++) {
             char symbol = head[i];
             i++;
-            if (i >= head.length() || head[i] != ':') break;
+            if (i >= head.length()) break;
+            if (head[i] == 'n') {
+                symbol = '\n';
+                i++;
+            }
             i++;
 
             int count = 0;
