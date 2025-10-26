@@ -197,15 +197,21 @@ public:
     }
 };
 
-template <typename T1>
 class huffmanTree
 {
 private:
     priorityQ<Node*> theHuffman;
     int *freqTable;
     string *codeTable;
-    Node *root;
     int capacity;
+
+    void deleteTree(Node* node) {
+        if (node) {
+            deleteTree(node->left);
+            deleteTree(node->right);
+            delete node;
+        }
+    }
 
 public:
     huffmanTree(int sz = 256) : theHuffman(sz)
@@ -216,9 +222,11 @@ public:
         fill_n(freqTable, sz, 0);
         fill_n(codeTable, sz, "");
     }
+
     ~huffmanTree()
     {
         delete[] freqTable;
+        delete[] codeTable;
     }
 
     int *generateFreqTable(ifstream &infile)
@@ -255,41 +263,33 @@ public:
         makeCodes(node->right, code + "1"); // go right = 1;
     }
 
-    Node *populate(int *freqT)
-    {
-        for (int i = 0; i < capacity; i++)
-        {
-            if (freqT[i] != 0)
-            {
+    Node *populate(int *freqT) {
+        priorityQ<Node*> localHuffman(capacity); 
+
+        for (int i = 0; i < capacity; i++) {
+            if (freqT[i] != 0) {
                 Node* n = new Node(static_cast<char>(i), freqT[i]);
-                theHuffman.push(n);
+                localHuffman.push(n); 
             }
         }
 
-        while (theHuffman.getCapacity() > 1)
-        {
-            Node* n1 = theHuffman.pop(); // the smaller
-            Node* n2 = theHuffman.pop(); // the larger or the same
+        while (localHuffman.getCapacity() > 1) {
+            Node* n1 = localHuffman.pop();
+            Node* n2 = localHuffman.pop();
 
-            Node *leftChild = new Node(*n1);
-            Node *rightChild = new Node(*n2);
+            Node* N = new Node('\0', n1->freq + n2->freq);
 
-            Node* N = new Node('\0', leftChild->freq + rightChild->freq);
-
-            if (*n1 > *n2)
-            {
-                N->right = leftChild;
-                N->left = rightChild;
+            if (*n1 < *n2) {
+                N->left = n1;
+                N->right = n2;
+            } else {
+                N->left = n2;
+                N->right = n1;
             }
-            else
-            {
-                N->left = leftChild;
-                N->right = rightChild;
-            }
-            theHuffman.push(N);
-        } // Now you have a single top node that will be our whole tree root.
+            localHuffman.push(N);
+        } 
 
-        return theHuffman.top();
+        return localHuffman.top(); 
     }
 
     void compress(ifstream &infile)
@@ -297,7 +297,7 @@ public:
         ofstream outfile("testCompressed.txt");
 
         int *freqT = generateFreqTable(infile);
-        root = populate(freqT);
+        Node* root = populate(freqT);
         makeCodes(root, ""); // now codeTable is filled at every needed index.
 
         if (!infile.is_open() || !outfile.is_open())
@@ -386,6 +386,8 @@ public:
             }
         }
         
+        deleteTree(decompress_root);
+
         return;
     }
 };
@@ -393,7 +395,7 @@ public:
 int main()
 {
 
-    huffmanTree<Node> huff(256);
+    huffmanTree huff(256);
     // step 1: generate frequency table
     ifstream infile("testUncompressed.txt");
     if (!infile.is_open())
