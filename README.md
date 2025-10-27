@@ -3,3 +3,7 @@ Mohamed AboElfotouh: Implemented hasLeftChild(), hasRightChild(), hasParent(), i
 Mohamed Dawood: Modified > and cout overload in Node. Implemented <, == in Node. Implemented getCapacity() in priorityQ. Impleneted generateFreqTable(), makeCode(), populate(), compress().
 
 Omar Beshir: Implemented the decompression functionality, improved memory management and allocation throughout the project, standardized compressed file's output to improve decompression, debugged and fixed multiple minor and major errors in the codebase.
+
+Mahmoud Alaskndrani: Implemented priorityQ(), ~priorityQ(),push(), pop(), top(), getLeftChild(), getRightChild(), getParent(), shiftDown() in priorityQ;
+Implemented operator> in Node
+Fixed some errors in File Handling in main and operator<< in Node
