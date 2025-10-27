@@ -62,7 +62,7 @@ struct Node
     friend ostream &operator<<(ostream &os, const Node &n)
     {
         os << n.freq;
-        os << ' ' <<n.ch;
+        os << " " <<n.ch;
         return os;
     }
 };

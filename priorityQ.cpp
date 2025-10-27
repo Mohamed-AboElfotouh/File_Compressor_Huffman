@@ -124,7 +124,7 @@ public:
     {
         for (int i = 0; i < cur_capacity; i++)
         {
-            cout << arr[i];
+            cout << arr[i] << " ";
         }
         cout << endl;
     }
