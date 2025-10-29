@@ -7,13 +7,15 @@ using namespace std;
 class huffmanTree
 {
 private:
-    priorityQ<Node*> theHuffman;
+    priorityQ<Node *> theHuffman;
     int *freqTable;
     string *codeTable;
     int capacity;
 
-    void deleteTree(Node* node) {
-        if (node) {
+    void deleteTree(Node *node)
+    {
+        if (node)
+        {
             deleteTree(node->left);
             deleteTree(node->right);
             delete node;
@@ -62,41 +64,56 @@ public:
 
         if (!node->left && !node->right) // reached a leaf node
         {
-            codeTable[(unsigned char)node->ch] = code; // when you reach the leaf assign the code to its index.
-            return;
+            if (code != "")
+            {
+                codeTable[(unsigned char)node->ch] = code; // when you reach the leaf assign the code to its index.
+                return;
+            }
+            else
+            {
+                codeTable[(unsigned char)node->ch] = "0"; //in case only 1 character in the whole text
+                return;
+            }
         }
 
         makeCodes(node->left, code + "0");  // go left = 0
         makeCodes(node->right, code + "1"); // go right = 1;
     }
 
-    Node *populate(int *freqT) {
-        priorityQ<Node*> localHuffman(capacity); 
+    Node *populate(int *freqT)
+    {
+        priorityQ<Node *> localHuffman(capacity);
 
-        for (int i = 0; i < capacity; i++) {
-            if (freqT[i] != 0) {
-                Node* n = new Node(static_cast<char>(i), freqT[i]);
-                localHuffman.push(n); 
+        for (int i = 0; i < capacity; i++)
+        {
+            if (freqT[i] != 0)
+            {
+                Node *n = new Node(static_cast<char>(i), freqT[i]);
+                localHuffman.push(n);
             }
         }
 
-        while (localHuffman.getCapacity() > 1) {
-            Node* n1 = localHuffman.pop();
-            Node* n2 = localHuffman.pop();
+        while (localHuffman.getCapacity() > 1)
+        {
+            Node *n1 = localHuffman.pop();
+            Node *n2 = localHuffman.pop();
 
-            Node* N = new Node('\0', n1->freq + n2->freq);
+            Node *N = new Node('\0', n1->freq + n2->freq);
 
-            if (*n1 < *n2) {
+            if (*n1 < *n2)
+            {
                 N->left = n1;
                 N->right = n2;
-            } else {
+            }
+            else
+            {
                 N->left = n2;
                 N->right = n1;
             }
             localHuffman.push(N);
-        } 
+        }
 
-        return localHuffman.top(); 
+        return localHuffman.top();
     }
 
     void compress(ifstream &infile)
@@ -104,7 +121,7 @@ public:
         ofstream outfile("testCompressed.txt");
 
         int *freqT = generateFreqTable(infile);
-        Node* root = populate(freqT);
+        Node *root = populate(freqT);
         makeCodes(root, ""); // now codeTable is filled at every needed index.
 
         if (!infile.is_open() || !outfile.is_open())
@@ -122,14 +139,17 @@ public:
                     if (!first)
                         outfile << ','; // comma before not after
                     first = false;
-                    if (char(i) == '\n') outfile << "En" << ':' << freqT[i];
-                    else outfile << char(i) << ':' << freqT[i];
+                    if (char(i) == '\n')
+                        outfile << "En" << ':' << freqT[i];
+                    else
+                        outfile << char(i) << ':' << freqT[i];
                 }
             }
             outfile << endl;
 
             infile.clear();
-            infile.seekg(0, ios::beg); // to reset it
+            infile.seekg(0, ios::beg); // to reset it from outer files
+
             char x;
             while (infile.get(x))
             {
@@ -141,7 +161,7 @@ public:
         outfile.close();
         infile.close();
         deleteTree(root);
-        
+
         return;
     }
 
@@ -154,29 +174,33 @@ public:
         string head;
         getline(infile, head);
 
-        int freq[capacity] {};
-        
-        for (int i = 0; i < head.length(); i++) {
+        int freq[capacity]{};
+
+        for (int i = 0; i < head.length(); i++)
+        {
             char symbol = head[i];
             i++;
-            if (i >= head.length()) break;
-            if (head[i] == 'n') {
+            if (i >= head.length())
+                break;
+            if (head[i] == 'n')
+            {
                 symbol = '\n';
                 i++;
             }
             i++;
 
             int count = 0;
-            
-            while (i < head.length() && isdigit(head[i])) {
+
+            while (i < head.length() && isdigit(head[i]))
+            {
                 count = count * 10 + (head[i] - '0');
                 i++;
             }
 
             freq[(unsigned char)symbol] = count;
         }
-        
-        Node* decompress_root = populate(freq);
+
+        Node *decompress_root = populate(freq);
 
         string bitstring;
         string output;
@@ -186,22 +210,26 @@ public:
         while (infile.get(bit))
             if (bit == '0' || bit == '1')
                 bitstring += bit;
-        
+
         Node *cur = decompress_root;
 
-        for (auto x : bitstring) {
-            if (x == '0') {
+        for (auto x : bitstring)
+        {
+            if (x == '0')
+            {
                 cur = cur->left;
             }
-            else {
+            else
+            {
                 cur = cur->right;
             }
-            if (!cur->left && !cur->right) {
+            if (!cur->left && !cur->right)
+            {
                 outfile << cur->ch;
                 cur = decompress_root;
             }
         }
-        
+
         deleteTree(decompress_root);
         infile.close();
         outfile.close();
