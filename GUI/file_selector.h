@@ -26,7 +26,6 @@ private:
     Ui::File_Selector *ui;
     bool compress;
     QString currentFilePath;
-    QString currentFileContent;
 };
 
 #endif // FILE_SELECTOR_H

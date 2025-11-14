@@ -1,5 +1,6 @@
 #include "file_selector.h"
 #include "ui_file_selector.h"
+#include "../driver.cpp"
 #include <QFileDialog>
 #include <QFile>
 #include <QTextStream>
@@ -43,6 +44,7 @@ void File_Selector::on_selectFileButton_clicked()
 
     currentFilePath = fileName;
 
+
     // Read the file
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -50,10 +52,7 @@ void File_Selector::on_selectFileButton_clicked()
         return;
     }
 
-    // Read file content using QTextStream
-    QTextStream in(&file);
-    currentFileContent = in.readAll();
-    file.close();
+
     QString c = "compress";
     if(!compress)
     {
@@ -65,15 +64,18 @@ void File_Selector::on_selectFileButton_clicked()
 
 void File_Selector::on_actionButton_clicked()
 {
-    qDebug() << currentFileContent;
     QString message = "";
     if(compress)
     {
-        message = "The file has been compressed to {new_filename}!";
+        string new_filename = run_process(currentFilePath.toStdString(), true);
+        QString qnew_filename = QString::fromStdString(new_filename);
+        message = "The file has been compressed to " + qnew_filename + "!";
     }
     else
     {
-        message = "The file has been decompressed to {new_filename}!";
+        string new_filename = run_process(currentFilePath.toStdString(), false);
+        QString qnew_filename = QString::fromStdString(new_filename);
+        message = "The file has been decompressed to " + qnew_filename + "!";
     }
     QMessageBox::information(this, "Success!", message);
     exit(0);
