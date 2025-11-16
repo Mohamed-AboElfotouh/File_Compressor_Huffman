@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
-
+// Baseline Time = 4200 ms
 class PerformanceNormalizer
 {
 private:
@@ -79,7 +79,7 @@ int main()
 {
     PerformanceNormalizer normalizer;
 
-    normalizer.measureBaseline();
+    normalizer.setupNormalization(4200);
 
     return 0;
 }
