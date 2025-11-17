@@ -241,6 +241,18 @@ public:
     }
 };
 
+string getOutputFilename(const string& inputFilename, const string& suffix)
+{
+    size_t lastDot = inputFilename.find_last_of('.');
+
+    if (lastDot == string::npos)
+    {
+        return inputFilename + suffix;
+    }
+
+    return inputFilename.substr(0, lastDot) + suffix + inputFilename.substr(lastDot);
+}
+
 string run_process(string filename,bool process)
 {
 
@@ -262,7 +274,7 @@ string run_process(string filename,bool process)
     }
     else
     {
-        resultfile = huff.decompress(infile, filename);
+        resultfile = huff.decompress(infile, getOutputFilename(filename, "_decompressed"));
     infile.close();
     qDebug() << "Decompression done! Check decompressed.txt\n";
     }
