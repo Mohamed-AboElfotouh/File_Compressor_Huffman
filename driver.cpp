@@ -72,7 +72,7 @@ public:
             }
             else
             {
-                codeTable[(unsigned char)node->ch] = "0"; //in case only 1 character in the whole text
+                codeTable[(unsigned char)node->ch] = "0"; // in case only 1 character in the whole text
                 return;
             }
         }
@@ -117,131 +117,95 @@ public:
         return localHuffman.top();
     }
 
-    string compress(ifstream &infile, const string& filename)
+    string compress(ifstream &infile, const string &filename)
     {
         string resultfile = filename.substr(0, filename.find_last_of('.')) + ".DAAB";
-        ofstream outfile(resultfile);
+        ofstream outfile(resultfile, ios::binary);
+        if (!outfile.is_open())
+            throw runtime_error("Output file failed.");
 
         int *freqT = generateFreqTable(infile);
         Node *root = populate(freqT);
-        makeCodes(root, ""); // now codeTable is filled at every needed index.
+        makeCodes(root, "");
 
-        if (!infile.is_open() || !outfile.is_open())
+        outfile.write(reinterpret_cast<char *>(freqT), sizeof(int) * 256);
+
+        infile.clear();
+        infile.seekg(0, ios::beg);
+
+        unsigned char buffer = 0;
+        int bitCount = 0;
+
+        char c;
+        while (infile.get(c))
         {
-            qDebug() << "\nError: Input/Output file is not open!\n";
-            return string();
-        }
-        else
-        {
-            bool first = true;
-            for (int i = 0; i < capacity; i++)
+            string &code = codeTable[(unsigned char)c];
+            for (char bit : code)
             {
-                if (freqT[i] != 0)
+                buffer <<= 1;
+                if (bit == '1')
+                    buffer |= 1;
+                bitCount++;
+
+                if (bitCount == 8)
                 {
-                    if (!first)
-                        outfile << ','; // comma before not after
-                    first = false;
-                    if (char(i) == '\n')
-                        outfile << "En" << ':' << freqT[i];
-                    else
-                        outfile << char(i) << ':' << freqT[i];
+                    outfile.put(buffer);
+                    bitCount = 0;
+                    buffer = 0;
                 }
             }
-            outfile << endl;
-
-            infile.clear();
-            infile.seekg(0, ios::beg); // to reset it from outer files
-
-            char x;
-            while (infile.get(x))
-            {
-                // infile.get(x);
-                outfile << codeTable[(int((unsigned char)x))];
-            }
         }
 
+        if (bitCount > 0)
+        {
+            buffer <<= (8 - bitCount);
+            outfile.put(buffer);
+        }
+
+        deleteTree(root);
         outfile.close();
         infile.close();
-        deleteTree(root);
-
         return resultfile;
     }
 
-    string decompress(ifstream &infile, const string& filename)
+    string decompress(ifstream &infile, const string &filename)
     {
         string resultfile = filename.substr(0, filename.find_last_of('.')) + ".txt";
-        ofstream outfile(resultfile);
-        if (!infile.is_open())
-            throw runtime_error("Compressed file not open.");
+        ofstream outfile(resultfile, ios::binary);
+        if (!outfile.is_open())
+            throw runtime_error("Output file failed.");
 
-        string head;
-        getline(infile, head);
+        int freq[256];
+        infile.read(reinterpret_cast<char *>(freq), sizeof(int) * 256);
 
-        int freq[capacity]{};
+        Node *root = populate(freq);
+        Node *cur = root;
 
-        for (size_t i = 0; i < head.length(); i++)
+        unsigned char byte;
+        while (infile.read(reinterpret_cast<char *>(&byte), 1))
         {
-            char symbol = head[i];
-            i++;
-            if (i >= head.length())
-                break;
-            if (head[i] == 'n')
+            for (int i = 7; i >= 0; i--)
             {
-                symbol = '\n';
-                i++;
-            }
-            i++;
+                bool bit = (byte >> i) & 1;
 
-            int count = 0;
+                cur = bit ? cur->right : cur->left;
 
-            while (i < head.length() && isdigit(head[i]))
-            {
-                count = count * 10 + (head[i] - '0');
-                i++;
-            }
-
-            freq[(unsigned char)symbol] = count;
-        }
-
-        Node *decompress_root = populate(freq);
-
-        string bitstring;
-        string output;
-
-        char bit;
-
-        while (infile.get(bit))
-            if (bit == '0' || bit == '1')
-                bitstring += bit;
-
-        Node *cur = decompress_root;
-
-        for (auto x : bitstring)
-        {
-            if (x == '0')
-            {
-                cur = cur->left;
-            }
-            else
-            {
-                cur = cur->right;
-            }
-            if (!cur->left && !cur->right)
-            {
-                outfile << cur->ch;
-                cur = decompress_root;
+                if (!cur->left && !cur->right)
+                {
+                    outfile.put(cur->ch);
+                    cur = root;
+                }
             }
         }
 
-        deleteTree(decompress_root);
+        deleteTree(root);
         infile.close();
         outfile.close();
-
         return resultfile;
     }
 };
 
-string getOutputFilename(const string& inputFilename, const string& suffix)
+string getOutputFilename(const string &inputFilename, const string &suffix)
 {
     size_t lastDot = inputFilename.find_last_of('.');
 
@@ -253,19 +217,19 @@ string getOutputFilename(const string& inputFilename, const string& suffix)
     return inputFilename.substr(0, lastDot) + suffix + inputFilename.substr(lastDot);
 }
 
-string run_process(string filename,bool process)
+string run_process(string filename, bool process)
 {
 
     string resultfile = "";
     huffmanTree huff(256);
 
-    ifstream infile(filename);
+    ifstream infile(filename, ios::binary);
     if (!infile.is_open())
     {
         qDebug() << "Error: Could not open file.\n";
         return string();
     }
-    if(process)
+    if (process)
     {
 
         resultfile = huff.compress(infile, filename);
@@ -275,8 +239,8 @@ string run_process(string filename,bool process)
     else
     {
         resultfile = huff.decompress(infile, getOutputFilename(filename, "_decompressed"));
-    infile.close();
-    qDebug() << "Decompression done! Check decompressed.txt\n";
+        infile.close();
+        qDebug() << "Decompression done! Check decompressed.txt\n";
     }
 
     return resultfile;
