@@ -1,4 +1,4 @@
-Mohamed AboElfotouh: Implemented hasLeftChild(), hasRightChild(), hasParent(), isEmpty() & shiftUp() in priorityQ. Implemented > and cout overload in Node.
+Mohamed AboElfotouh: Assigned tasks throughout the 3 milestones, implemented hasLeftChild(), hasRightChild(), hasParent(), isEmpty() & shiftUp() in priorityQ. Implemented > and cout overload in Node. Implemented the preliminary GUI that was presented in Milestone 2 including the homepage and the decompression/compression page.
 
 Mohamed Dawood: Modified > and cout overload in Node. Implemented <, == in Node. Implemented getCapacity() in priorityQ. Impleneted generateFreqTable(), makeCode(), populate(), compress().
 
