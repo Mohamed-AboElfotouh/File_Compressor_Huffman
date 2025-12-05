@@ -119,6 +119,12 @@ public:
 
     string compress(ifstream &infile, const string &filename)
     {
+        // Validate file extension
+        size_t lastDot = filename.find_last_of('.');
+        if (lastDot == string::npos || filename.substr(lastDot) != ".txt") {
+            throw runtime_error("Error: Compression requires a .txt file.");
+        }
+        
         string resultfile = filename.substr(0, filename.find_last_of('.')) + ".DAAB";
         ofstream outfile(resultfile, ios::binary);
         if (!outfile.is_open())
@@ -170,6 +176,12 @@ public:
 
     string decompress(ifstream &infile, const string &filename)
     {
+        // Validate file extension
+        size_t lastDot = filename.find_last_of('.');
+        if (lastDot == string::npos || filename.substr(lastDot) != ".DAAB") {
+            throw runtime_error("Error: Decompression requires a .DAAB file.");
+        }
+        
         string resultfile = filename.substr(0, filename.find_last_of('.')) + ".txt";
         ofstream outfile(resultfile, ios::binary);
         if (!outfile.is_open())
@@ -221,6 +233,30 @@ string run_process(string filename, bool process)
 {
 
     string resultfile = "";
+    
+    // Validate file extension based on operation type
+    size_t lastDot = filename.find_last_of('.');
+    if (lastDot != string::npos) {
+        string extension = filename.substr(lastDot);
+        
+        if (process) {
+            // Compression: must be .txt
+            if (extension != ".txt") {
+                qDebug() << "Error: Compression requires a .txt file.\n";
+                return string();
+            }
+        } else {
+            // Decompression: must be .DAAB
+            if (extension != ".DAAB") {
+                qDebug() << "Error: Decompression requires a .DAAB file.\n";
+                return string();
+            }
+        }
+    } else {
+        qDebug() << "Error: File must have an extension.\n";
+        return string();
+    }
+    
     huffmanTree huff(256);
 
     ifstream infile(filename, ios::binary);

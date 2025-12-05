@@ -4,6 +4,4 @@ Mohamed Dawood: Modified > and cout overload in Node. Implemented <, == in Node.
 
 Omar Beshir: Implemented the decompression functionality, improved memory management and allocation throughout the project, standardized compressed file's output to improve decompression, debugged and fixed multiple minor and major errors in the codebase.
 
-Mahmoud Alaskndrani: Implemented priorityQ(), ~priorityQ(),push(), pop(), top(), getLeftChild(), getRightChild(), getParent(), shiftDown() in priorityQ;
-Implemented operator> in Node
-Fixed some errors in File Handling in main and operator<< in Node
+Mahmoud Alaskndrani: Implemented priorityQ(), ~priorityQ(), push(), pop(), top(), getLeftChild(), getRightChild(), getParent(), shiftDown() in priorityQ. Implemented operator> in Node. Resolved merge conflicts and fixed resulting errors to ensure stability. Connected GUI to backend (created driver.cpp). Added large dataset for testing. Implemented file extension validation for compression (.txt) and decompression (.DAAB) with error handling in both GUI and backend.
