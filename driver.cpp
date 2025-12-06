@@ -1,221 +1,205 @@
-#include <iostream>
-#include <fstream>
-#include <stdexcept>
-#include "Node.cpp"
-#include "priorityQ.cpp"
+#include "driver.h"
 #include <QDebug>
-using namespace std;
-class huffmanTree
+
+void huffmanTree::deleteTree(Node *node)
 {
-private:
-    priorityQ<Node *> theHuffman;
-    int *freqTable;
-    string *codeTable;
-    int capacity;
-
-    void deleteTree(Node *node)
+    if (node)
     {
-        if (node)
+        deleteTree(node->left);
+        deleteTree(node->right);
+        delete node;
+    }
+}
+
+huffmanTree::huffmanTree(int sz) : theHuffman(sz)
+{
+    capacity = sz;
+    freqTable = new int[sz];
+    codeTable = new string[sz];
+    fill_n(freqTable, sz, 0);
+    fill_n(codeTable, sz, "");
+}
+
+huffmanTree::~huffmanTree()
+{
+    delete[] freqTable;
+    delete[] codeTable;
+}
+
+int *huffmanTree::generateFreqTable(ifstream &infile)
+{
+    char x;
+
+    if (infile.is_open())
+    {
+        while (infile.get(x))
         {
-            deleteTree(node->left);
-            deleteTree(node->right);
-            delete node;
+            freqTable[(unsigned char)x]++;
         }
+        return freqTable;
     }
-
-public:
-    huffmanTree(int sz = 256) : theHuffman(sz)
+    else
     {
-        capacity = sz;
-        freqTable = new int[sz];
-        codeTable = new string[sz];
-        fill_n(freqTable, sz, 0);
-        fill_n(codeTable, sz, "");
+        qDebug() << "\nError: Uncompressed file is not open!\n";
+        return NULL;
     }
+}
 
-    ~huffmanTree()
+void huffmanTree::makeCodes(Node *node, string code)
+{
+    if (!node)
+        return;
+
+    if (!node->left && !node->right)
     {
-        delete[] freqTable;
-        delete[] codeTable;
-    }
-
-    int *generateFreqTable(ifstream &infile)
-    {
-        char x;
-
-        if (infile.is_open())
+        if (code != "")
         {
-            while (infile.get(x))
-            {
-                freqTable[(unsigned char)x]++;
-            }
-            return freqTable;
+            codeTable[(unsigned char)node->ch] = code;
+            return;
         }
         else
         {
-            qDebug() << "\nError: Uncompressed file is not open!\n";
-            return NULL;
-        }
-    }
-
-    void makeCodes(Node *node, string code)
-    {
-        if (!node)
+            codeTable[(unsigned char)node->ch] = "0";
             return;
-
-        if (!node->left && !node->right) // reached a leaf node
-        {
-            if (code != "")
-            {
-                codeTable[(unsigned char)node->ch] = code; // when you reach the leaf assign the code to its index.
-                return;
-            }
-            else
-            {
-                codeTable[(unsigned char)node->ch] = "0"; // in case only 1 character in the whole text
-                return;
-            }
         }
-
-        makeCodes(node->left, code + "0");  // go left = 0
-        makeCodes(node->right, code + "1"); // go right = 1;
     }
 
-    Node *populate(int *freqT)
+    makeCodes(node->left, code + "0");
+    makeCodes(node->right, code + "1");
+}
+
+Node *huffmanTree::populate(int *freqT)
+{
+    priorityQ<Node *> localHuffman(capacity);
+
+    for (int i = 0; i < capacity; i++)
     {
-        priorityQ<Node *> localHuffman(capacity);
-
-        for (int i = 0; i < capacity; i++)
+        if (freqT[i] != 0)
         {
-            if (freqT[i] != 0)
-            {
-                Node *n = new Node(static_cast<char>(i), freqT[i]);
-                localHuffman.push(n);
-            }
+            Node *n = new Node(static_cast<char>(i), freqT[i]);
+            localHuffman.push(n);
         }
-
-        while (localHuffman.getCapacity() > 1)
-        {
-            Node *n1 = localHuffman.pop();
-            Node *n2 = localHuffman.pop();
-
-            Node *N = new Node('\0', n1->freq + n2->freq);
-
-            if (*n1 < *n2)
-            {
-                N->left = n1;
-                N->right = n2;
-            }
-            else
-            {
-                N->left = n2;
-                N->right = n1;
-            }
-            localHuffman.push(N);
-        }
-
-        return localHuffman.top();
     }
 
-    string compress(ifstream &infile, const string &filename)
+    while (localHuffman.getCapacity() > 1)
     {
-        // Validate file extension
-        size_t lastDot = filename.find_last_of('.');
-        if (lastDot == string::npos || filename.substr(lastDot) != ".txt") {
-            throw runtime_error("Error: Compression requires a .txt file.");
-        }
-        
-        string resultfile = filename.substr(0, filename.find_last_of('.')) + ".DAAB";
-        ofstream outfile(resultfile, ios::binary);
-        if (!outfile.is_open())
-            throw runtime_error("Output file failed.");
+        Node *n1 = localHuffman.pop();
+        Node *n2 = localHuffman.pop();
 
-        int *freqT = generateFreqTable(infile);
-        Node *root = populate(freqT);
-        makeCodes(root, "");
+        Node *N = new Node('\0', n1->freq + n2->freq);
 
-        outfile.write(reinterpret_cast<char *>(freqT), sizeof(int) * 256);
-
-        infile.clear();
-        infile.seekg(0, ios::beg);
-
-        unsigned char buffer = 0;
-        int bitCount = 0;
-
-        char c;
-        while (infile.get(c))
+        if (*n1 < *n2)
         {
-            string &code = codeTable[(unsigned char)c];
-            for (char bit : code)
-            {
-                buffer <<= 1;
-                if (bit == '1')
-                    buffer |= 1;
-                bitCount++;
-
-                if (bitCount == 8)
-                {
-                    outfile.put(buffer);
-                    bitCount = 0;
-                    buffer = 0;
-                }
-            }
+            N->left = n1;
+            N->right = n2;
         }
-
-        if (bitCount > 0)
+        else
         {
-            buffer <<= (8 - bitCount);
-            outfile.put(buffer);
+            N->left = n2;
+            N->right = n1;
         }
-
-        deleteTree(root);
-        outfile.close();
-        infile.close();
-        return resultfile;
+        localHuffman.push(N);
     }
 
-    string decompress(ifstream &infile, const string &filename)
+    return localHuffman.top();
+}
+
+string huffmanTree::compress(ifstream &infile, const string &filename)
+{
+    size_t lastDot = filename.find_last_of('.');
+    if (lastDot == string::npos || filename.substr(lastDot) != ".txt") {
+        throw runtime_error("Error: Compression requires a .txt file.");
+    }
+    
+    string resultfile = filename.substr(0, filename.find_last_of('.')) + ".daab";
+    ofstream outfile(resultfile, ios::binary);
+    if (!outfile.is_open())
+        throw runtime_error("Output file failed.");
+
+    int *freqT = generateFreqTable(infile);
+    Node *root = populate(freqT);
+    makeCodes(root, "");
+
+    outfile.write(reinterpret_cast<char *>(freqT), sizeof(int) * 256);
+
+    infile.clear();
+    infile.seekg(0, ios::beg);
+
+    unsigned char buffer = 0;
+    int bitCount = 0;
+
+    char c;
+    while (infile.get(c))
     {
-        // Validate file extension
-        size_t lastDot = filename.find_last_of('.');
-        if (lastDot == string::npos || filename.substr(lastDot) != ".DAAB") {
-            throw runtime_error("Error: Decompression requires a .DAAB file.");
-        }
-        
-        string resultfile = filename.substr(0, filename.find_last_of('.')) + ".txt";
-        ofstream outfile(resultfile, ios::binary);
-        if (!outfile.is_open())
-            throw runtime_error("Output file failed.");
-
-        int freq[256];
-        infile.read(reinterpret_cast<char *>(freq), sizeof(int) * 256);
-
-        Node *root = populate(freq);
-        Node *cur = root;
-
-        unsigned char byte;
-        while (infile.read(reinterpret_cast<char *>(&byte), 1))
+        string &code = codeTable[(unsigned char)c];
+        for (char bit : code)
         {
-            for (int i = 7; i >= 0; i--)
+            buffer <<= 1;
+            if (bit == '1')
+                buffer |= 1;
+            bitCount++;
+
+            if (bitCount == 8)
             {
-                bool bit = (byte >> i) & 1;
-
-                cur = bit ? cur->right : cur->left;
-
-                if (!cur->left && !cur->right)
-                {
-                    outfile.put(cur->ch);
-                    cur = root;
-                }
+                outfile.put(buffer);
+                bitCount = 0;
+                buffer = 0;
             }
         }
-
-        deleteTree(root);
-        infile.close();
-        outfile.close();
-        return resultfile;
     }
-};
+
+    if (bitCount > 0)
+    {
+        buffer <<= (8 - bitCount);
+        outfile.put(buffer);
+    }
+
+    deleteTree(root);
+    outfile.close();
+    infile.close();
+    return resultfile;
+}
+
+string huffmanTree::decompress(ifstream &infile, const string &filename)
+{
+    size_t lastDot = filename.find_last_of('.');
+    if (lastDot == string::npos || filename.substr(lastDot) != ".daab") {
+        throw runtime_error("Error: Decompression requires a .daab file.");
+    }
+    
+    string resultfile = filename.substr(0, filename.find_last_of('.')) + ".txt";
+    ofstream outfile(resultfile, ios::binary);
+    if (!outfile.is_open())
+        throw runtime_error("Output file failed.");
+
+    int freq[256];
+    infile.read(reinterpret_cast<char *>(freq), sizeof(int) * 256);
+
+    Node *root = populate(freq);
+    Node *cur = root;
+
+    unsigned char byte;
+    while (infile.read(reinterpret_cast<char *>(&byte), 1))
+    {
+        for (int i = 7; i >= 0; i--)
+        {
+            bool bit = (byte >> i) & 1;
+
+            cur = bit ? cur->right : cur->left;
+
+            if (!cur->left && !cur->right)
+            {
+                outfile.put(cur->ch);
+                cur = root;
+            }
+        }
+    }
+
+    deleteTree(root);
+    infile.close();
+    outfile.close();
+    return resultfile;
+}
 
 string getOutputFilename(const string &inputFilename, const string &suffix)
 {
@@ -231,24 +215,20 @@ string getOutputFilename(const string &inputFilename, const string &suffix)
 
 string run_process(string filename, bool process)
 {
-
     string resultfile = "";
     
-    // Validate file extension based on operation type
     size_t lastDot = filename.find_last_of('.');
     if (lastDot != string::npos) {
         string extension = filename.substr(lastDot);
         
         if (process) {
-            // Compression: must be .txt
             if (extension != ".txt") {
                 qDebug() << "Error: Compression requires a .txt file.\n";
                 return string();
             }
         } else {
-            // Decompression: must be .DAAB
-            if (extension != ".DAAB") {
-                qDebug() << "Error: Decompression requires a .DAAB file.\n";
+            if (extension != ".daab") {
+                qDebug() << "Error: Decompression requires a .daab file.\n";
                 return string();
             }
         }
@@ -265,18 +245,18 @@ string run_process(string filename, bool process)
         qDebug() << "Error: Could not open file.\n";
         return string();
     }
+    
     if (process)
     {
-
         resultfile = huff.compress(infile, filename);
         infile.close();
-        qDebug() << "Compression done! Check testCompressed.txt\n";
+        qDebug() << "Compression done!\n";
     }
     else
     {
-        resultfile = huff.decompress(infile, getOutputFilename(filename, "_decompressed"));
+        resultfile = huff.decompress(infile, filename);
         infile.close();
-        qDebug() << "Decompression done! Check decompressed.txt\n";
+        qDebug() << "Decompression done!\n";
     }
 
     return resultfile;
