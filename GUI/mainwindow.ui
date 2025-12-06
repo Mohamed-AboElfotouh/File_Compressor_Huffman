@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>776</width>
-    <height>423</height>
+    <height>710</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -212,6 +212,42 @@
      <string>Clear</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>410</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Size of selected file:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelSizeSelectedFile">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>430</y>
+      <width>181</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0 bytes</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="textSelectedFile">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>460</y>
+      <width>521</width>
+      <height>191</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -219,7 +255,7 @@
      <x>0</x>
      <y>0</y>
      <width>776</width>
-     <height>17</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

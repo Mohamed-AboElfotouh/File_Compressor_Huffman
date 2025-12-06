@@ -457,3 +457,48 @@ void MainWindow::updateDaabSelectionCount()
                                   .arg(checkedCount)
                                   .arg(totalCount));
 }
+
+void MainWindow::on_txtTable_cellClicked(int row, int column)
+{
+    if (row < 0) return;
+
+    QTableWidgetItem *pathItem = ui->txtTable->item(row, 2);
+
+    if (pathItem) {
+        displayFileContent(pathItem->text());
+    }
+}
+
+void MainWindow::on_daabTable_cellClicked(int row, int column)
+{
+    if (row < 0) return;
+
+    QTableWidgetItem *pathItem = ui->daabTable->item(row, 2);
+
+    if (pathItem) {
+        displayFileContent(pathItem->text());
+    }
+}
+
+void MainWindow::displayFileContent(const QString &filePath)
+{
+    QFile file(filePath);
+    QFileInfo fileInfo(filePath);
+
+    if (fileInfo.exists()) {
+        ui->labelSizeSelectedFile->setText(QString::number(fileInfo.size()) + " bytes");
+    } else {
+        ui->labelSizeSelectedFile->setText("File not found");
+        return;
+    }
+
+    if (file.open(QIODevice::ReadOnly)) {
+        QByteArray fileData = file.readAll();
+
+        ui->textSelectedFile->setText(fileData);
+
+        file.close();
+    } else {
+        ui->textSelectedFile->setText("Error: Could not open file for reading.");
+    }
+}

@@ -43,6 +43,8 @@ private slots:
     void on_compressPushButton_clicked();
     void on_decompressPushButton_clicked();
 
+    void on_txtTable_cellClicked(int row, int column);
+    void on_daabTable_cellClicked(int row, int column);
     // Optional: slots for removing selected items
     void on_removeTxtButton_clicked();
     void on_removeDaabButton_clicked();
@@ -78,7 +80,7 @@ private:
 
     QPoint m_StartPos;  // starting point for drag detection
     void startDragFromTable(QTableWidget *table, QMouseEvent *event);
-
+    void displayFileContent(const QString &filePath);
 
 };
 
