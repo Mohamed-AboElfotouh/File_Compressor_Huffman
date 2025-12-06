@@ -167,7 +167,7 @@ string huffmanTree::decompress(ifstream &infile, const string &filename)
         throw runtime_error("Error: Decompression requires a .daab file.");
     }
     
-    string resultfile = filename.substr(0, filename.find_last_of('.')) + ".txt";
+    string resultfile = filename.substr(0, filename.find_last_of('.')) + "_decompressed.txt";
     ofstream outfile(resultfile, ios::binary);
     if (!outfile.is_open())
         throw runtime_error("Output file failed.");
