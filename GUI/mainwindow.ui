@@ -17,7 +17,7 @@
    <widget class="QLabel" name="welcomeLabel">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>70</x>
       <y>-20</y>
       <width>621</width>
       <height>71</height>
@@ -25,6 +25,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Comic Sans MS</family>
       <pointsize>20</pointsize>
      </font>
     </property>
@@ -44,6 +45,12 @@
       <height>31</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
     <property name="text">
      <string>Compress</string>
     </property>
@@ -57,6 +64,11 @@
       <height>31</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+     </font>
+    </property>
     <property name="text">
      <string>Decompress</string>
     </property>
@@ -66,37 +78,48 @@
      <rect>
       <x>10</x>
       <y>90</y>
-      <width>271</width>
+      <width>301</width>
       <height>301</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+     </font>
     </property>
    </widget>
    <widget class="QTableWidget" name="daabTable">
     <property name="geometry">
      <rect>
-      <x>480</x>
+      <x>450</x>
       <y>90</y>
-      <width>281</width>
+      <width>311</width>
       <height>301</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+     </font>
     </property>
    </widget>
    <widget class="QLabel" name="dragndrop">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>-30</y>
-      <width>561</width>
-      <height>151</height>
+      <x>130</x>
+      <y>0</y>
+      <width>501</width>
+      <height>81</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Comic Sans MS</family>
       <pointsize>12</pointsize>
      </font>
     </property>
     <property name="text">
-     <string>Drag and Drop the &quot;.txt&quot; or &quot;.daab&quot; files you wish to process!</string>
+     <string>Drag and Drop the &quot;.txt&quot; or &quot;.daab&quot; file(s) you wish to process!</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -105,14 +128,15 @@
    <widget class="QLabel" name="txtLabel">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>100</x>
       <y>50</y>
-      <width>81</width>
+      <width>80</width>
       <height>31</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Comic Sans MS</family>
       <pointsize>12</pointsize>
      </font>
     </property>
@@ -128,12 +152,13 @@
      <rect>
       <x>580</x>
       <y>50</y>
-      <width>81</width>
+      <width>90</width>
       <height>31</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Comic Sans MS</family>
       <pointsize>12</pointsize>
      </font>
     </property>
@@ -147,14 +172,15 @@
    <widget class="QLabel" name="txtSelLabel">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>120</y>
-      <width>191</width>
-      <height>61</height>
+      <x>280</x>
+      <y>100</y>
+      <width>200</width>
+      <height>90</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Comic Sans MS</family>
       <pointsize>10</pointsize>
      </font>
     </property>
@@ -171,11 +197,12 @@
       <x>220</x>
       <y>230</y>
       <width>321</width>
-      <height>51</height>
+      <height>70</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Comic Sans MS</family>
       <pointsize>10</pointsize>
      </font>
     </property>
@@ -195,6 +222,11 @@
       <height>31</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+     </font>
+    </property>
     <property name="text">
      <string>Clear</string>
     </property>
@@ -208,6 +240,11 @@
       <height>31</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+     </font>
+    </property>
     <property name="text">
      <string>Clear</string>
     </property>
@@ -217,12 +254,18 @@
      <rect>
       <x>130</x>
       <y>410</y>
-      <width>111</width>
+      <width>240</width>
       <height>20</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
     <property name="text">
-     <string>Size of selected file:</string>
+     <string>Size of the Selected File:</string>
     </property>
    </widget>
    <widget class="QLabel" name="labelSizeSelectedFile">
@@ -233,6 +276,12 @@
       <width>181</width>
       <height>16</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+      <pointsize>11</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>0 bytes</string>
@@ -246,6 +295,11 @@
       <width>521</width>
       <height>191</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+     </font>
     </property>
    </widget>
   </widget>
