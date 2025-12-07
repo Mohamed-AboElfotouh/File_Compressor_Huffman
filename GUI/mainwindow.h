@@ -12,12 +12,10 @@
 #include <QPushButton>
 #include <QCheckBox>
 
-
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-// Structure to store file information
 struct FileData {
     QString fileName;
     QString filePath;
@@ -31,8 +29,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
-    // Getters for file lists (for processing later)
     QList<FileData> getTxtFiles() const { return m_txtFiles; }
     QList<FileData> getDaabFiles() const { return m_daabFiles; }
 
@@ -41,19 +37,16 @@ protected:
     void dropEvent(QDropEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
-
 private slots:
     void on_compressPushButton_clicked();
     void on_decompressPushButton_clicked();
 
     void on_txtTable_cellClicked(int row, int column);
     void on_daabTable_cellClicked(int row, int column);
-    // Optional: slots for removing selected items
     void on_removeTxtButton_clicked();
     void on_removeDaabButton_clicked();
 
     void on_txtTableClearPush_clicked();
-
     void on_daabTableClearPush_clicked();
 
     void updateTxtSelectionCount();
@@ -61,7 +54,6 @@ private slots:
 
 
     void on_txtTable_itemChanged(QTableWidgetItem *item);
-
     void on_daabTable_itemChanged(QTableWidgetItem *item);
 
     void toggleTheme();
@@ -72,11 +64,9 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    // Storage for file data
     QList<FileData> m_txtFiles;
     QList<FileData> m_daabFiles;
 
-    // Helper methods
     void setupTables();
     void addFileToTable(QTableWidget *table, const FileData &fileData);
     void refreshTxtTable();
