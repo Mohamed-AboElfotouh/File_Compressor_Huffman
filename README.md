@@ -104,14 +104,14 @@ This is our simple program that applies Huffman coding to compress `.txt` files 
 - Huffman Tree Generation: Rewrote the populate() function to correctly generate the Huffman tree.
 - Preorder Functionality: Implemented a function to produce the preorder output of the Huffman tree (now removed).
 - Bit Packing Implementation:
--- Researched and implemented bit packing (writing to the file in binary) to significantly improve compression ratios.
--- Rewrote the main compression and decompression functions to utilize bitwise operations for binary file I/O, drastically reducing compressed file size.
+  - Researched and implemented bit packing (writing to the file in binary) to significantly improve compression ratios.
+  - Rewrote the main compression and decompression functions to utilize bitwise operations for binary file I/O, drastically reducing compressed file size.
 - Codebase Refinement & Debugging:
--- Improved memory management by implementing checks to ensure dynamically allocated data is correctly deleted, eliminating memory leaks (e.g., in the priority queue and throughout the codebase).
--- Refined various functions to standardize code style and ensure proper file closing.
--- Added a .gitignore file to exclude system files and folders from the repository.
--- User Interface (UI) Features: Implemented TA-suggested features for the GUI, including showing a preview of the input/output files and their metadata (revisiting Qt concepts for UI elements).
--- Quality Assurance: Discovered and coordinated the resolution of an implicit bug within the GUI implementation.
+  - Improved memory management by implementing checks to ensure dynamically allocated data is correctly deleted, eliminating memory leaks (e.g., in the priority queue and throughout the codebase).
+  - Refined various functions to standardize code style and ensure proper file closing.
+  - Added a .gitignore file to exclude system files and folders from the repository.
+  - User Interface (UI) Features: Implemented TA-suggested features for the GUI, including showing a preview of the input/output files and their metadata (revisiting Qt concepts for UI elements).
+  - Quality Assurance: Discovered and coordinated the resolution of an implicit bug within the GUI implementation.
 
 ---
 
