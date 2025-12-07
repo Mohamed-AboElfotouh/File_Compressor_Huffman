@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
-#include "..\driver.cpp"  // Include your Huffman class
+#include "..\driver.cpp" 
 #include <QFile>
 #include <QTextStream>
 #include <QSettings>

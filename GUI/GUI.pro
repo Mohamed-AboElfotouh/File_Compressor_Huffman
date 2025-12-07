@@ -24,8 +24,7 @@ FORMS += \
 qnc.target = .PHONY
 QMAKE_EXTRA_TARGETS += qnc
 
-DISTFILES += \
-    DIcon.png
+DISTFILES +=
 
 RESOURCES += \
     resources.qrc

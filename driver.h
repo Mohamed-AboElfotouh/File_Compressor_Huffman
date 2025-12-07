@@ -5,8 +5,8 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
-#include "Node.h"        // Change to .h
-#include "priorityQ.h"   // Change to .h
+#include "Node.h"      
+#include "priorityQ.h" 
 
 using namespace std;
 
