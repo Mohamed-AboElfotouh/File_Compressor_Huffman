@@ -23,3 +23,10 @@ FORMS += \
 # Default rules for deployment
 qnc.target = .PHONY
 QMAKE_EXTRA_TARGETS += qnc
+
+DISTFILES += \
+    DIcon.png
+
+RESOURCES += \
+    resources.qrc
+

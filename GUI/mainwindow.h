@@ -9,6 +9,8 @@
 #include <QFileInfo>
 #include <QUrl>
 #include <QList>
+#include <QPushButton>
+#include <QCheckBox>
 
 
 QT_BEGIN_NAMESPACE
@@ -37,6 +39,7 @@ public:
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 
 private slots:
@@ -61,6 +64,11 @@ private slots:
 
     void on_daabTable_itemChanged(QTableWidgetItem *item);
 
+    void toggleTheme();
+
+    void onTxtSelectAllChanged(int state);
+    void onDaabSelectAllChanged(int state);
+
 private:
     Ui::MainWindow *ui;
 
@@ -82,6 +90,15 @@ private:
     void startDragFromTable(QTableWidget *table, QMouseEvent *event);
     void displayFileContent(const QString &filePath);
 
+    QPushButton *m_themeToggleBtn;
+    bool m_isDarkMode;
+    void applyLightTheme();
+    void applyDarkTheme();
+    void updateThemeButtonPosition();
+
+    QCheckBox *m_txtSelectAllCheckbox;
+    QCheckBox *m_daabSelectAllCheckbox;
+    void updateHeaderCheckboxPositions();
 };
 
 #endif // MAINWINDOW_H
